@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PSER Nigehban | Smart QR</title>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            /* PSER Nigehban Color Palette */
+            --primary: #00A859;       /* Green */
+            --primary-dark: #007a41;
+            --accent: #FFD700;        /* Gold/Yellow */
+            
+            /* Glassmorphism Variables */
+            --glass: rgba(255, 255, 255, 0.75);
+            --glass-border: rgba(255, 255, 255, 0.6);
+            --shadow: 0 8px 32px 0 rgba(0, 50, 20, 0.15);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+        }
+
+        body {
+            background: #f0f4f3;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* --- Animated Background Shapes --- */
+        .blob {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            z-index: -1;
+            opacity: 0.8;
+            animation: float 8s infinite alternate;
+        }
+        
+        .blob-1 { 
+            top: -5%; 
+            left: -10%; 
+            width: 400px; 
+            height: 400px; 
+            background: #a8ffcc; 
+        }
+        
+        .blob-2 { 
+            bottom: -5%; 
+            right: -10%; 
+            width: 350px; 
+            height: 350px; 
+            background: #ffeaa7; /* Soft Gold */
+            animation-delay: -4s; 
+        }
+        
+        @keyframes float {
+            0% { transform: translate(0, 0); }
+            100% { transform: translate(30px, 40px); }
+        }
+
+        /* --- Main Card (Glass Effect) --- */
+        .card {
+            background: var(--glass);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border: 1px solid var(--glass-border);
+            width: 90%;
+            max-width: 400px;
+            border-radius: 24px;
+            padding: 40px 30px;
+            box-shadow: var(--shadow);
+            text-align: center;
+            transition: transform 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+        }
+
+        /* Header */
+        .logo-area {
+            margin-bottom: 30px;
+        }
+        .logo-area i {
+            font-size: 42px;
+            background: linear-gradient(135deg, var(--primary), var(--accent));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            margin-bottom: 10px;
+        }
+        .logo-area h2 {
+            font-weight: 800;
+            color: #1a1a1a;
+            letter-spacing: -0.5px;
+        }
+        .logo-area p {
+            color: #666;
+            font-size: 14px;
+        }
+
+        /* Modern Input Styling */
+        .input-group {
+            position: relative;
+            margin-bottom: 25px;
+        }
+        
+        .input-group input {
+            width: 100%;
+            padding: 16px 20px;
+            border: 2px solid transparent;
+            background: rgba(255, 255, 255, 0.9);
+            border-radius: 12px;
+            font-size: 16px;
+            outline: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+            transition: 0.3s;
+        }
+
+        .input-group input:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 4px rgba(0, 168, 89, 0.15);
+        }
+
+        .input-group label {
+            position: absolute;
+            left: 20px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #999;
+            font-size: 14px;
+            pointer-events: none;
+            transition: 0.3s;
+            background: transparent;
+        }
+
+        /* Floating Label Logic */
+        .input-group input:focus + label,
+        .input-group input:not(:placeholder-shown) + label {
+            top: 0;
+            font-size: 11px;
+            background: #fff;
+            padding: 0 5px;
+            color: var(--primary);
+            font-weight: 600;
+            border-radius: 4px;
+        }
+
+        /* Modern Button */
+        .btn-gen {
+            width: 100%;
+            padding: 16px;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            cursor: pointer;
+            box-shadow: 0 10px 20px rgba(0, 168, 89, 0.25);
+            transition: 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+        
+        .btn-gen:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 15px 25px rgba(0, 168, 89, 0.35);
+        }
+        
+        .btn-gen:active { transform: scale(0.98); }
+
+        /* QR Section */
+        #qr-container {
+            margin-top: 30px;
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            display: none; /* Hidden initially */
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.05);
+            animation: popIn 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        #qrcode {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 15px;
+        }
+
+        .download-btn {
+            display: inline-block;
+            color: var(--primary-dark);
+            text-decoration: none;
+            font-size: 13px;
+            font-weight: 700;
+            background: rgba(0, 168, 89, 0.1);
+            padding: 8px 15px;
+            border-radius: 20px;
+            transition: 0.2s;
+        }
+        
+        .download-btn:hover { background: rgba(0, 168, 89, 0.2); }
+
+        /* Developer Badge */
+        .dev-badge {
+            margin-top: 40px;
+            display: flex;
+            align-items: center;
+            background: rgba(255, 255, 255, 0.6);
+            padding: 8px 15px;
+            border-radius: 50px;
+            width: fit-content;
+            margin-left: auto;
+            margin-right: auto;
+            border: 1px solid rgba(255,255,255,0.8);
+        }
+
+        .dev-img {
+            width: 35px;
+            height: 35px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--primary);
+            margin-right: 10px;
+        }
+
+        .dev-text {
+            text-align: left;
+            line-height: 1.2;
+        }
+        .dev-text small { font-size: 10px; color: #888; text-transform: uppercase; letter-spacing: 0.5px; }
+        .dev-text h5 { font-size: 13px; color: #333; margin: 0; }
+
+        @keyframes popIn {
+            from { transform: scale(0.8); opacity: 0; }
+            to { transform: scale(1); opacity: 1; }
+        }
+
+        /* Mobile Fixes */
+        @media (max-width: 480px) {
+            .card { width: 95%; padding: 30px 20px; }
+            .blob { opacity: 0.6; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Animated Background Blobs -->
+    <div class="blob blob-1"></div>
+    <div class="blob blob-2"></div>
+
+    <div class="card">
+        <!-- Logo Area -->
+        <div class="logo-area">
+            <i class="fa-solid fa-qrcode"></i>
+            <h2>PSER Nigehban</h2>
+            <p>Generate your digital ID instantly</p>
+        </div>
+
+        <!-- Input Area -->
+        <div class="input-group">
+            <!-- 'placeholder=" "' is required for the floating label animation -->
+            <input type="number" id="cardInput" placeholder=" ">
+            <label for="cardInput">Enter Card / CNIC Number</label>
+        </div>
+
+        <!-- Generate Button -->
+        <button class="btn-gen" onclick="generateQR()">
+            Generate QR Code <i class="fa-solid fa-arrow-right"></i>
+        </button>
+
+        <!-- QR Result Area -->
+        <div id="qr-container">
+            <div id="qrcode"></div>
+            <a href="#" id="downloadBtn" class="download-btn" download="nigehban-card.png">
+                <i class="fa-solid fa-download"></i> Download Image
+            </a>
+        </div>
+
+        <!-- Developer Section -->
+        <div class="dev-badge">
+            <!-- 1. CHANGE IMAGE LINK HERE -->
+            <img src="https://avatar.iran.liara.run/public/boy" alt="Developer" class="dev-img">
+            
+            <div class="dev-text">
+                <small>Developed by</small>
+                <!-- 2. CHANGE NAME HERE -->
+                <h5>Your Name</h5>
+            </div>
+        </div>
+    </div>
+
+    <!-- QR Library Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+    
+    <script>
+        function generateQR() {
+            const input = document.getElementById('cardInput');
+            const container = document.getElementById('qr-container');
+            const qrDiv = document.getElementById('qrcode');
+            const dlBtn = document.getElementById('downloadBtn');
+
+            // Validation: Check if empty
+            if(!input.value) {
+                input.style.borderColor = "#ff4757";
+                // Shake animation logic could go here
+                setTimeout(() => input.style.borderColor = "transparent", 2000);
+                return;
+            }
+
+            // Clear previous QR
+            qrDiv.innerHTML = "";
+            container.style.display = "block";
+
+            // Generate New QR
+            new QRCode(qrDiv, {
+                text: input.value,
+                width: 160,
+                height: 160,
+                colorDark : "#1a1a1a",
+                colorLight : "#ffffff",
+                correctLevel : QRCode.CorrectLevel.H
+            });
+
+            // Update Download Link
+            setTimeout(() => {
+                const img = qrDiv.querySelector('img');
+                if(img) dlBtn.href = img.src;
+            }, 100);
+        }
+    </script>
+</body>
+</html>
